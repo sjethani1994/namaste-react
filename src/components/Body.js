@@ -1,4 +1,4 @@
-import RestaurantCard from "./RestaurantCard";
+import RestaurantCard, { withPromotedLabel } from "./RestaurantCard";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Shimmer from "./Shimmer";
@@ -9,6 +9,8 @@ const Body = () => {
   const [searchText, setSearchText] = useState("");
   const { resList, filteredList, setFilteredList } = useRestaurantList();
   const showOnlineStatus = useOnlineStatus();
+
+  const RestaurantCardPramoted = withPromotedLabel(RestaurantCard);
 
   if (showOnlineStatus === false) {
     return (
@@ -65,7 +67,7 @@ const Body = () => {
             className="cursor-pointer rounded-[9px] bg-brand px-4 py-[11px] text-sm font-semibold text-white transition hover:-translate-y-px hover:bg-brand-dark active:translate-y-0"
             onClick={() => {
               const filterList = resList.filter((res) =>
-                res.name.toLowerCase().includes(searchText.toLowerCase()),
+                res.info.name.toLowerCase().includes(searchText.toLowerCase()),
               );
 
               setFilteredList(filterList);
@@ -78,17 +80,25 @@ const Body = () => {
         <button
           className="cursor-pointer self-start rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-[#333] shadow-[0_2px_6px_rgba(0,0,0,0.05)] transition duration-250 hover:-translate-y-0.5 hover:border-orange-400 hover:bg-[#fff4ed] hover:text-orange-600 hover:shadow-[0_4px_12px_rgba(234,88,12,0.15)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-orange-500/35 active:translate-y-0 xs:self-auto"
           onClick={() => {
-            setFilteredList(resList.filter((res) => res.rating > 4.5));
+            setFilteredList(resList.filter((res) => res.info.avgRating > 4.3));
           }}
         >
           ⭐ Top Rated Restaurants
         </button>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] items-stretch gap-[25px] py-5">
+      <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-[25px] py-5">
         {filteredList.map((restaurant) => (
-          <Link key={restaurant.id} to={"/restaurants/" + restaurant.id}>
-            <RestaurantCard resData={restaurant} />
+          <Link
+            key={restaurant.info.id}
+            to={"/restaurants/" + restaurant.info.id}
+            className="block h-full"
+          >
+            {restaurant.info.promoted ? (
+              <RestaurantCardPramoted resData={restaurant} />
+            ) : (
+              <RestaurantCard resData={restaurant} />
+            )}
           </Link>
         ))}
       </div>

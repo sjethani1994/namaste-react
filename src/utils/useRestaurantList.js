@@ -13,8 +13,13 @@ const useRestaurantList = () => {
     const data = await fetch(RESTAURANT_LIST_API);
     const json = await data.json();
 
-    setResList(json.recipes);
-    setFilteredList(json.recipes);
+    // Same path as the real Swiggy API response
+    const restaurants =
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
+        ?.restaurants ?? [];
+
+    setResList(restaurants);
+    setFilteredList(restaurants);
   };
 
   return { resList, filteredList, setFilteredList };

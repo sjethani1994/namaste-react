@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import {
-  RESTAURANT_DETAILS_API,
-  MENU_BY_CUISINE_API,
-  MENU_FALLBACK_API,
-} from "./constants";
+import { MENU_API } from "./constants";
+
+const ITEM_CATEGORY_TYPE =
+  "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory";
 
 const useRestaurantMenu = (resId) => {
-  const [resInfo, setResInfo] = useState([]);
-  const [menuItems, setMenuItems] = useState([]);
+  const [resInfo, setResInfo] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,35 +16,28 @@ const useRestaurantMenu = (resId) => {
         setLoading(true);
         setError(null);
 
-        // API 1: Fetch restaurant details
-        const resData = await fetch(RESTAURANT_DETAILS_API + resId);
+        const response = await fetch(MENU_API + resId);
 
-        if (!resData.ok) {
-          throw new Error("Failed to fetch restaurant details");
+        if (!response.ok) {
+          throw new Error(
+            response.status === 404
+              ? "Restaurant not found"
+              : "Failed to fetch menu",
+          );
         }
 
-        const resJson = await resData.json();
-        setResInfo(resJson);
+        const json = await response.json();
 
-        // API 2: Fetch menu using the cuisine from API 1
-        const menuData = await fetch(
-          MENU_BY_CUISINE_API + encodeURIComponent(resJson.cuisine),
-        );
+        // Same paths as the real Swiggy menu API response
+        setResInfo(json?.data?.cards[2]?.card?.card?.info);
 
-        if (!menuData.ok) {
-          throw new Error("Failed to fetch menu");
-        }
+        // Keep only the menu categories (skips banners, licence info etc.)
+        const menuCategories =
+          json?.data?.cards[3]?.groupedCard?.cardGroupMap?.REGULAR?.cards?.filter(
+            (c) => c.card?.card?.["@type"] === ITEM_CATEGORY_TYPE,
+          ) ?? [];
 
-        const menuJson = await menuData.json();
-
-        // TheMealDB returns { meals: null } when it has no dishes for a cuisine
-        if (menuJson.meals) {
-          setMenuItems(menuJson.meals);
-        } else {
-          const fallbackData = await fetch(MENU_FALLBACK_API);
-          const fallbackJson = await fallbackData.json();
-          setMenuItems(fallbackJson.meals ?? []);
-        }
+        setCategories(menuCategories);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -58,7 +50,7 @@ const useRestaurantMenu = (resId) => {
     }
   }, [resId]);
 
-  return { resInfo, menuItems, loading, error };
+  return { resInfo, categories, loading, error };
 };
 
 export default useRestaurantMenu;

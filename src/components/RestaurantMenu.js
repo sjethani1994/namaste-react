@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom";
 import Shimmer from "./Shimmer";
 import useRestaurantMenu from "../utils/useRestaurantMenu";
+import { CDN_URL } from "../utils/constants";
 
 const RestaurantMenu = () => {
   const { resId } = useParams();
 
-  const { resInfo, menuItems, loading, error } = useRestaurantMenu(resId);
+  const { resInfo, categories, loading, error } = useRestaurantMenu(resId);
 
   // Show shimmer while API calls are running
   if (loading) return <Shimmer />;
@@ -28,14 +29,31 @@ const RestaurantMenu = () => {
     );
   }
 
-  const { name, cuisine, rating, reviewCount, cookTimeMinutes, image } =
-    resInfo;
+  const {
+    name,
+    cuisines,
+    avgRatingString,
+    totalRatingsString,
+    costForTwoMessage,
+    sla,
+    areaName,
+    cloudinaryImageId,
+  } = resInfo;
+
+  const totalItems = categories.reduce(
+    (sum, c) => sum + c.card.card.itemCards.length,
+    0,
+  );
 
   return (
     <div className="mx-auto w-full max-w-[900px] px-3.5 pt-5 pb-10 text-[#282c3f] sm:px-5 sm:pt-7">
       <section className="flex flex-col items-start gap-4 rounded-[15px] border border-[#f0f0f3] bg-linear-135 from-[#fffaf5] to-white to-70% px-4 py-5 shadow-[0_8px_28px_rgba(40,44,63,0.045)] min-[381px]:flex-row sm:items-center sm:gap-6 sm:rounded-[20px] sm:p-[30px]">
         <div className="flex size-[58px] shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-[#fff0e5] sm:size-[94px] sm:rounded-[22px]">
-          <img src={image} alt={name} className="block size-full object-cover" />
+          <img
+            src={CDN_URL + cloudinaryImageId}
+            alt={name}
+            className="block size-full object-cover"
+          />
         </div>
 
         <div className="min-w-0">
@@ -45,18 +63,24 @@ const RestaurantMenu = () => {
           <h1 className="my-2 text-[23px] font-extrabold tracking-[-1px] wrap-anywhere text-[#202333] sm:text-[clamp(24px,4vw,34px)]">
             {name}
           </h1>
-          <p className="text-sm leading-[1.6] text-[#777987]">{cuisine}</p>
+          <p className="text-sm leading-[1.6] text-[#777987]">
+            {cuisines.join(", ")} • {areaName}
+          </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-2.5">
             <span className="rounded-[7px] bg-[#e5f6e9] px-2.5 py-1.5 text-xs font-extrabold text-[#187b3e]">
-              ★ {rating}
+              ★ {avgRatingString}
             </span>
             <span className="text-xs font-semibold text-[#525565]">
-              {reviewCount} ratings
+              {totalRatingsString}
             </span>
             <span className="text-[#b6b7be]">•</span>
             <span className="text-xs font-semibold text-[#525565]">
-              {cookTimeMinutes + 15} mins
+              {costForTwoMessage}
+            </span>
+            <span className="text-[#b6b7be]">•</span>
+            <span className="text-xs font-semibold text-[#525565]">
+              {sla?.slaString}
             </span>
           </div>
         </div>
@@ -71,18 +95,18 @@ const RestaurantMenu = () => {
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-[21px] font-extrabold tracking-[-0.7px] text-[#202333] sm:text-[25px]">
-              Popular dishes
+              Menu
             </h2>
             <p className="mt-[7px] text-[13px] text-[#858793]">
-              Explore something delicious today
+              {categories.length} categories
             </p>
           </div>
           <span className="shrink-0 rounded-lg border border-[#f0e0d4] bg-[#fff8f2] px-3 py-2 text-xs font-bold text-[#d95500]">
-            {menuItems?.length} items
+            {totalItems} items
           </span>
         </div>
 
-        {menuItems?.length === 0 ? (
+        {categories.length === 0 ? (
           <div className="rounded-2xl border border-[#ededf0] bg-white px-5 py-[55px] text-center">
             <span className="text-[35px] text-[#e85d04]">🍽</span>
             <h3 className="mt-4 mb-2 text-lg font-bold text-[#282c3f]">
@@ -93,62 +117,84 @@ const RestaurantMenu = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-[#ededf0] bg-white">
-            {menuItems?.map((item) => (
-              <article
-                className="flex items-center justify-between gap-3 border-b border-[#eeeef1] px-3.5 py-5 transition-colors last:border-b-0 hover:bg-[#fffaf6] sm:gap-6 sm:p-6"
-                key={item.idMeal}
-              >
-                <div className="min-w-0 pl-[15px]">
-                  <span className="mb-3 flex size-4 items-center justify-center rounded-[3px] border-[1.5px] border-[#198754]">
-                    <span className="size-[7px] rounded-full bg-[#198754]" />
-                  </span>
+          // Episode 11: turn each category into an accordion (one open at a time)
+          categories.map((category) => {
+            const { title, itemCards } = category.card.card;
 
-                  <h3 className="mb-2.5 text-[15px] leading-[1.45] font-bold wrap-anywhere text-[#252839] sm:text-[17px]">
-                    {item.strMeal}
-                  </h3>
+            return (
+              <div key={title} className="mb-6">
+                <h3 className="mb-3 text-lg font-extrabold text-[#202333]">
+                  {title} ({itemCards.length})
+                </h3>
 
-                  <p className="mb-2.5 text-sm font-bold text-[#303344]">
-                    ₹{(Number(item.idMeal) % 300) + 99}
-                  </p>
+                <div className="overflow-hidden rounded-2xl border border-[#ededf0] bg-white">
+                  {itemCards.map((itemCard) => {
+                    const { id, name, price, defaultPrice, description, imageId, isVeg } =
+                      itemCard.card.info;
 
-                  <p className="max-w-[480px] text-[11px] leading-[1.8] text-[#858793] sm:text-xs">
-                    Freshly prepared with carefully selected ingredients. A
-                    delicious choice for your meal.
-                  </p>
+                    return (
+                      <article
+                        className="flex items-center justify-between gap-3 border-b border-[#eeeef1] px-3.5 py-5 transition-colors last:border-b-0 hover:bg-[#fffaf6] sm:gap-6 sm:p-6"
+                        key={id}
+                      >
+                        <div className="min-w-0 pl-[15px]">
+                          {/* Swiggy prices are in paise, so divide by 100 */}
+                          <span
+                            className={`mb-3 flex size-4 items-center justify-center rounded-[3px] border-[1.5px] ${
+                              isVeg ? "border-[#198754]" : "border-[#e43b4f]"
+                            }`}
+                          >
+                            <span
+                              className={`size-[7px] rounded-full ${
+                                isVeg ? "bg-[#198754]" : "bg-[#e43b4f]"
+                              }`}
+                            />
+                          </span>
 
-                  <span className="mt-3.5 inline-block text-[9px] font-extrabold tracking-[1.2px] text-[#d95500]">
-                    CHEF'S SELECTION
-                  </span>
+                          <h4 className="mb-2.5 text-[15px] leading-[1.45] font-bold wrap-anywhere text-[#252839] sm:text-[17px]">
+                            {name}
+                          </h4>
+
+                          <p className="mb-2.5 text-sm font-bold text-[#303344]">
+                            ₹{(price ?? defaultPrice) / 100}
+                          </p>
+
+                          {description && (
+                            <p className="max-w-[480px] text-[11px] leading-[1.8] text-[#858793] sm:text-xs">
+                              {description}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex shrink-0 flex-col items-center">
+                          <div className="flex size-[65px] items-center justify-center overflow-hidden rounded-xl bg-linear-135 from-[#fff0e5] to-[#ffe0c6] text-2xl min-[381px]:h-[72px] min-[381px]:w-[76px] sm:h-[90px] sm:w-[104px]">
+                            {imageId ? (
+                              <img
+                                src={CDN_URL + imageId}
+                                alt={name}
+                                className="block size-full object-cover"
+                              />
+                            ) : (
+                              "🍽"
+                            )}
+                          </div>
+                          <button
+                            className="relative -mt-3 flex min-w-[76px] cursor-pointer items-center justify-center gap-[7px] rounded-lg border border-[#e6e6e9] bg-white px-[13px] py-[9px] text-xs font-extrabold text-[#198754] shadow-[0_3px_10px_rgba(0,0,0,0.06)] transition-colors hover:border-[#198754] hover:bg-[#f2fff6] sm:min-w-[90px] sm:gap-3"
+                            type="button"
+                            aria-label={`Add ${name}`}
+                          >
+                            ADD <span className="text-base">+</span>
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
-
-                <div className="flex shrink-0 flex-col items-center">
-                  <div className="flex size-[65px] items-center justify-center overflow-hidden rounded-xl bg-linear-135 from-[#fff0e5] to-[#ffe0c6] min-[381px]:h-[72px] min-[381px]:w-[76px] sm:h-[90px] sm:w-[104px]">
-                    <img
-                      src={`${item.strMealThumb}/small`}
-                      alt={item.strMeal}
-                      className="block size-full object-cover"
-                    />
-                  </div>
-                  <button
-                    className="relative -mt-3 flex min-w-[76px] cursor-pointer items-center justify-center gap-[7px] rounded-lg border border-[#e6e6e9] bg-white px-[13px] py-[9px] text-xs font-extrabold text-[#198754] shadow-[0_3px_10px_rgba(0,0,0,0.06)] transition-colors hover:border-[#198754] hover:bg-[#f2fff6] sm:min-w-[90px] sm:gap-3"
-                    type="button"
-                    aria-label={`Add ${item.strMeal}`}
-                  >
-                    ADD <span className="text-base">+</span>
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            );
+          })
         )}
       </section>
-
-      <footer className="mt-[30px] flex justify-center gap-[9px] text-xs text-[#999ba4]">
-        <span>Made with care</span>
-        <span className="text-[#e85d04]">•</span>
-        <span>Enjoy your meal!</span>
-      </footer>
     </div>
   );
 };
