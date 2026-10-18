@@ -14,6 +14,7 @@ import Contact from "./components/Contact";
 import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
 import Footer from "./components/Footer";
+import Shimmer from "./components/Shimmer";
 
 
 const Grocery = lazy(() => import("./components/Grocery"));
@@ -27,10 +28,13 @@ const AppLayout = () => {
   }, [pathname]);
 
   return (
-    <div id="app">
+    <div className="flex h-dvh flex-col">
       <Header />
       {/* Only this area scrolls; header and footer stay in place */}
-      <main className="app-content" ref={contentRef}>
+      <main
+        ref={contentRef}
+        className="scrollbar-brand min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      >
         <Outlet />
       </main>
       <Footer />
@@ -62,7 +66,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/grocery",
-        element: <Suspense fallback={<Error />}><Grocery /></Suspense>,
+        element: <Suspense fallback={<Shimmer />}><Grocery /></Suspense>,
       },
     ],
     errorElement: <Error />,

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { RESTAURANT_DETAILS_API, MENU_BY_CUISINE_API } from "./constants";
+import {
+  RESTAURANT_DETAILS_API,
+  MENU_BY_CUISINE_API,
+  MENU_FALLBACK_API,
+} from "./constants";
 
 const useRestaurantMenu = (resId) => {
   const [resInfo, setResInfo] = useState([]);
@@ -33,7 +37,15 @@ const useRestaurantMenu = (resId) => {
         }
 
         const menuJson = await menuData.json();
-        setMenuItems(menuJson.meals);
+
+        // TheMealDB returns { meals: null } when it has no dishes for a cuisine
+        if (menuJson.meals) {
+          setMenuItems(menuJson.meals);
+        } else {
+          const fallbackData = await fetch(MENU_FALLBACK_API);
+          const fallbackJson = await fallbackData.json();
+          setMenuItems(fallbackJson.meals ?? []);
+        }
       } catch (err) {
         setError(err.message);
       } finally {

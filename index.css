@@ -1,73 +1,67 @@
-/* Global styles only. Component styles live in src/styles/<Component>.css */
+@import "tailwindcss";
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* Design tokens: use them as bg-brand, text-cream, xs:..., animate-shimmer etc. */
+@theme {
+  --font-sans: Arial, Helvetica, sans-serif;
+
+  /* Extra small breakpoint (520px) for phones, below Tailwind's sm (640px) */
+  --breakpoint-xs: 32.5rem;
+
+  --color-brand: #ff5200;
+  --color-brand-dark: #e84900;
+  --color-cream: #fff7f0;
+  --color-peach: #fff0e6;
+
+  --animate-shimmer: shimmer 1.5s linear infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
 }
 
-/* The page itself never scrolls. Only .app-content (between header and footer) does */
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+@layer base {
+  /* The page itself never scrolls. Only <main> (between header and footer) does */
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-[#fafafa] text-[#222] antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #222;
-  background-color: #fafafa;
-  -webkit-font-smoothing: antialiased;
-}
-
-img {
-  max-width: 100%;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-/* App shell: header (fixed) / content (scrolls) / footer (fixed) */
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh; /* mobile: excludes the browser address bar */
-}
-
-#app > .header,
-#app > .footer {
-  flex-shrink: 0;
-}
-
-.app-content {
-  flex: 1;
-  min-height: 0; /* lets the flex child shrink so overflow works */
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-/* Thin, theme-coloured scrollbar for the content area */
-.app-content {
+/* Thin, theme-coloured scrollbar: add the class "scrollbar-brand" */
+@utility scrollbar-brand {
   scrollbar-width: thin;
   scrollbar-color: #ffb48a transparent;
-}
 
-.app-content::-webkit-scrollbar {
-  width: 8px;
-}
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.app-content::-webkit-scrollbar-thumb {
-  background: #ffb48a;
-  border-radius: 8px;
-}
+  &::-webkit-scrollbar-thumb {
+    background: #ffb48a;
+    border-radius: 8px;
+  }
 
-.app-content::-webkit-scrollbar-thumb:hover {
-  background: #ff5200;
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand);
+  }
 }
