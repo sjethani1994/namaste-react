@@ -1,1 +1,73 @@
 /* Global styles only. Component styles live in src/styles/<Component>.css */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* The page itself never scrolls. Only .app-content (between header and footer) does */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222;
+  background-color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* App shell: header (fixed) / content (scrolls) / footer (fixed) */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh; /* mobile: excludes the browser address bar */
+}
+
+#app > .header,
+#app > .footer {
+  flex-shrink: 0;
+}
+
+.app-content {
+  flex: 1;
+  min-height: 0; /* lets the flex child shrink so overflow works */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Thin, theme-coloured scrollbar for the content area */
+.app-content {
+  scrollbar-width: thin;
+  scrollbar-color: #ffb48a transparent;
+}
+
+.app-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.app-content::-webkit-scrollbar-thumb {
+  background: #ffb48a;
+  border-radius: 8px;
+}
+
+.app-content::-webkit-scrollbar-thumb:hover {
+  background: #ff5200;
+}

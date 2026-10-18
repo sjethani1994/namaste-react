@@ -1,6 +1,6 @@
 
 .offline-page {
-  min-height: 75vh;
+  min-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,7 +110,7 @@
 .body {
   padding: 30px 50px;
   background-color: #fafafa;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 .search {

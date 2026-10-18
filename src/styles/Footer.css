@@ -1,0 +1,68 @@
+/* Footer - matches the header theme */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  padding: 12px 50px;
+  background-color: #fff7f0;
+  border-top: 1px solid #f1e4da;
+  box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.05);
+
+  font-size: 13px;
+  color: #666;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer-brand span {
+  color: #ff5200;
+  font-weight: 700;
+}
+
+.footer-links {
+  display: flex;
+  gap: 18px;
+}
+
+.footer-links a {
+  color: #555;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover,
+.footer-links a.active {
+  color: #ff5200;
+}
+
+.footer-copy {
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 10px 20px;
+  }
+
+  /* Keep the footer short on tablets so there's more room to scroll content */
+  .footer-copy {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .footer {
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .footer-links {
+    display: none;
+  }
+}
