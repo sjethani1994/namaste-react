@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import Header from "./components/Header";
 import Body from "./components/Body";
 import {
@@ -15,6 +15,8 @@ import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
 import Footer from "./components/Footer";
 
+
+const Grocery = lazy(() => import("./components/Grocery"));
 const AppLayout = () => {
   const contentRef = useRef(null);
   const { pathname } = useLocation();
@@ -57,6 +59,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/restaurants/:resId",
         element: <RestaurantMenu />,
+      },
+      {
+        path: "/grocery",
+        element: <Suspense fallback={<Error />}><Grocery /></Suspense>,
       },
     ],
     errorElement: <Error />,
