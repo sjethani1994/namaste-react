@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+bower_components
+
+# Parcel build output and cache
+dist
+.parcel-cache
+
+# Test coverage
+coverage
+
+# Environment variables (API keys etc.)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs
+npm-debug.log*
+
+# OS files
+.DS_*
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.sublime*
+*.swp
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Backups
+**/*.backup.*
+**/*.back.*
+
+# Design files
+psd
+thumb
+sketch
