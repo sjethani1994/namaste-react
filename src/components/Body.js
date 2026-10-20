@@ -1,9 +1,10 @@
 import RestaurantCard, { withPromotedLabel } from "./RestaurantCard";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import Shimmer from "./Shimmer";
 import useOnlineStatus from "../utils/useOnlineStatus";
 import useRestaurantList from "../utils/useRestaurantList";
+import UserContext from "../utils/userContext";
 
 const Body = () => {
   const [searchText, setSearchText] = useState("");
@@ -11,6 +12,8 @@ const Body = () => {
   const showOnlineStatus = useOnlineStatus();
 
   const RestaurantCardPramoted = withPromotedLabel(RestaurantCard);
+
+  const { loggedInUser, setUserName } = useContext(UserContext)
 
   if (showOnlineStatus === false) {
     return (
@@ -85,6 +88,16 @@ const Body = () => {
         >
           ⭐ Top Rated Restaurants
         </button>
+
+        <div className="flex w-full items-center rounded-xl border border-gray-200 bg-white p-[5px] shadow-[0_2px_6px_rgba(0,0,0,0.05)] transition focus-within:border-brand focus-within:shadow-[0_0_0_3px_rgba(255,82,0,0.12)] xs:w-[380px] xs:max-w-full">
+          <input
+            type="text"
+            className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[15px] text-[#222] outline-none placeholder:text-[#999]"
+            placeholder="Add username ..."
+            value={loggedInUser}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-[25px] py-5">

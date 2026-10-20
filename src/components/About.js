@@ -122,7 +122,7 @@ const About = () => {
         <Link to="/" className={primaryBtn}>
           Explore Restaurants →
         </Link>
-        {/* <UserClass name={"Sumit Jethani"}/> */}
+        {/* <UserClass /> */}
       </section>
     </div>
   );

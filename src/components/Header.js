@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import LOGO_URL from "../utils/constants";
 import { NavLink } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
+import UserContext from "../utils/userContext";
 
 // NavLink passes { isActive } so the current page gets highlighted
 const navLinkClass = ({ isActive }) =>
@@ -12,6 +13,8 @@ const navLinkClass = ({ isActive }) =>
 const Header = () => {
   const [buttonLabel, setButtonLabel] = useState("Login");
   const isOnline = useOnlineStatus();
+  const data = useContext(UserContext);
+
   return (
     <header className="z-10 flex shrink-0 flex-col items-center gap-2.5 border-b border-[#f1f1f1] bg-cream px-3 py-2.5 shadow-[0_3px_15px_rgba(0,0,0,0.05)] xs:flex-row xs:justify-between xs:gap-[15px] xs:px-5 md:gap-[30px] md:px-[50px]">
       <NavLink to="/" className="group flex shrink-0 items-center">
@@ -82,6 +85,11 @@ const Header = () => {
             >
               {buttonLabel}
             </button>
+          </li>
+          <li>
+            <NavLink to="/grocery" className={navLinkClass}>
+              {data.loggedInUser}
+            </NavLink>
           </li>
         </ul>
       </nav>

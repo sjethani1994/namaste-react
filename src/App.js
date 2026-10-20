@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import Header from "./components/Header";
 import Body from "./components/Body";
 import {
@@ -15,7 +15,7 @@ import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
 import Footer from "./components/Footer";
 import Shimmer from "./components/Shimmer";
-
+import UserContext from "./utils/userContext";
 
 const Grocery = lazy(() => import("./components/Grocery"));
 const AppLayout = () => {
@@ -27,18 +27,27 @@ const AppLayout = () => {
     contentRef.current?.scrollTo(0, 0);
   }, [pathname]);
 
+  const [userName, setUserName] = useState();
+
+  useEffect(() => {
+    const data = {
+      name: "Sumit Jethani",
+    };
+    setUserName(data.name);
+  }, []);
   return (
-    <div className="flex h-dvh flex-col">
-      <Header />
-      {/* Only this area scrolls; header and footer stay in place */}
-      <main
-        ref={contentRef}
-        className="scrollbar-brand min-h-0 flex-1 overflow-y-auto overscroll-contain"
-      >
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <UserContext.Provider value={{ loggedInUser: userName, setUserName }}>
+      <div className="flex h-dvh flex-col">
+        <Header />
+        <main
+          ref={contentRef}
+          className="scrollbar-brand min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        >
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    </UserContext.Provider>
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -66,7 +75,11 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/grocery",
-        element: <Suspense fallback={<Shimmer />}><Grocery /></Suspense>,
+        element: (
+          <Suspense fallback={<Shimmer />}>
+            <Grocery />
+          </Suspense>
+        ),
       },
     ],
     errorElement: <Error />,
