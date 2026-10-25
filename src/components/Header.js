@@ -2,8 +2,7 @@ import { useContext, useState } from "react";
 import LOGO_URL from "../utils/constants";
 import { NavLink } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
-import UserContext from "../utils/userContext";
-
+import { useSelector } from "react-redux";
 // NavLink passes { isActive } so the current page gets highlighted
 const navLinkClass = ({ isActive }) =>
   `inline-flex items-center justify-center whitespace-nowrap rounded-[10px] p-2 text-xs font-semibold transition-colors hover:bg-[#fff4ed] hover:text-brand xs:px-2.5 xs:py-[9px] xs:text-sm md:px-4 md:py-[11px] md:text-[15px] ${
@@ -13,7 +12,7 @@ const navLinkClass = ({ isActive }) =>
 const Header = () => {
   const [buttonLabel, setButtonLabel] = useState("Login");
   const isOnline = useOnlineStatus();
-  const data = useContext(UserContext);
+  const cartItems = useSelector((store) => store.cart.items);
 
   return (
     <header className="z-10 flex shrink-0 flex-col items-center gap-2.5 border-b border-[#f1f1f1] bg-cream px-3 py-2.5 shadow-[0_3px_15px_rgba(0,0,0,0.05)] xs:flex-row xs:justify-between xs:gap-[15px] xs:px-5 md:gap-[30px] md:px-[50px]">
@@ -52,6 +51,40 @@ const Header = () => {
           </li>
 
           <li>
+            <NavLink
+              to="/cart"
+              className={({ isActive }) =>
+                `relative inline-flex items-center gap-2 rounded-[10px] p-2 text-sm font-semibold transition-colors hover:bg-[#fff4ed] hover:text-brand ${
+                  isActive ? "bg-peach text-brand" : "text-[#3d3d3d]"
+                }`
+              }
+              aria-label={`Cart, ${cartItems.length} items`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.5 3h2l2.7 12.2a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L22 7H5.5" />
+              </svg>
+              {cartItems.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold text-white">
+                  {cartItems.length}
+                </span>
+              )}
+            </NavLink>
+          </li>
+
+          <li>
             <div
               className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-[9px] py-[7px] text-xs font-semibold xs:gap-2 xs:px-[13px] xs:py-[9px] xs:text-[13px] ${
                 isOnline
@@ -85,11 +118,6 @@ const Header = () => {
             >
               {buttonLabel}
             </button>
-          </li>
-          <li>
-            <NavLink to="/grocery" className={navLinkClass}>
-              {data.loggedInUser}
-            </NavLink>
           </li>
         </ul>
       </nav>

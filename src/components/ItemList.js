@@ -1,6 +1,13 @@
+import { useDispatch } from "react-redux";
 import { CDN_URL } from "../utils/constants";
+import { addItem } from "../utils/cartSlice";
 
 const ItemList = ({ items }) => {
+  const dispatch = useDispatch();
+  const handleAddItem = (item) => {
+    dispatch(addItem(item));
+  };
+
   return (
     <div className="border-t border-[#eeeef1]">
       {items.map((itemCard) => {
@@ -57,6 +64,7 @@ const ItemList = ({ items }) => {
                 className="relative -mt-3 flex min-w-[76px] cursor-pointer items-center justify-center gap-[7px] rounded-lg border border-[#e6e6e9] bg-white px-[13px] py-[9px] text-xs font-extrabold text-[#198754] shadow-[0_3px_10px_rgba(0,0,0,0.06)] transition-colors hover:border-[#198754] hover:bg-[#f2fff6] sm:min-w-[90px] sm:gap-3"
                 type="button"
                 aria-label={`Add ${name}`}
+                onClick={() => handleAddItem(itemCard.card.info)}
               >
                 ADD <span className="text-base">+</span>
               </button>

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import userContext from './../utils/userContext';
 
 export default class UserClass extends Component {
   constructor(props) {
@@ -64,9 +63,6 @@ export default class UserClass extends Component {
           <p className="text-[15px] text-slate-500">
             Discover developers from around the world.
           </p>
-          <userContext.Consumer>
-            {({ loggedInUser }) => <h1 className="text-2xl text-white">{loggedInUser}</h1>}
-          </userContext.Consumer>
         </div>
 
         <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-[18px] sm:grid-cols-2 sm:gap-6 min-[901px]:grid-cols-3">

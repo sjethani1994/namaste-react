@@ -15,7 +15,9 @@ import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
 import Footer from "./components/Footer";
 import Shimmer from "./components/Shimmer";
-import UserContext from "./utils/userContext";
+import { Provider } from "react-redux";
+import appStore from "./utils/appStore";
+import Cart from "./components/Cart";
 
 const Grocery = lazy(() => import("./components/Grocery"));
 const AppLayout = () => {
@@ -36,7 +38,7 @@ const AppLayout = () => {
     setUserName(data.name);
   }, []);
   return (
-    <UserContext.Provider value={{ loggedInUser: userName, setUserName }}>
+    <Provider store={appStore}>
       <div className="flex h-dvh flex-col">
         <Header />
         <main
@@ -47,7 +49,7 @@ const AppLayout = () => {
         </main>
         <Footer />
       </div>
-    </UserContext.Provider>
+    </Provider>
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -80,6 +82,10 @@ const appRouter = createBrowserRouter([
             <Grocery />
           </Suspense>
         ),
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
       },
     ],
     errorElement: <Error />,
